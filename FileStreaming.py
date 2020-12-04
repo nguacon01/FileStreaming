@@ -2,9 +2,13 @@ import io
 import tempfile
 import requests
 class FileStreaming(object):
-    def __init__(self, url, chunk_size, load_to=None):
+    """
+    Stream a request and returns a tempfile
+    tempfile can be use as a file system
+    """
+    def __init__(self, url, chunk_size=None):
         self.url = url
-        self.chunk_size = chunk_size
+        self.chunk_size = 1024*1024 if chunk_size is None else chunk_size # chunk_size by default is 1Mb
         self.tempfile = tempfile.TemporaryFile()
         self.session = requests.Session()
         
@@ -31,10 +35,12 @@ class FileStreaming(object):
                     
     def read(self, up_to_bytes=None):
         self._loadFile(up_to_bytes)
-        
         return self.tempfile.read(up_to_bytes)
         
     def close(self):
+        """
+        remove tempfile
+        """
         self.tempfile.close()
         
     def __repr__(self):
